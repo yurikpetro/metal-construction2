@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Кровельное ограждение">
+  <rect width="32" height="32" rx="7" fill="#8C431F"/>
+  <g fill="none" stroke="#fff" stroke-linecap="round">
+    <!-- перила и стойки -->
+    <g stroke-width="2.6">
+      <path d="M3.5 5.9 L28.5 7.7"/>
+      <path d="M3.5 14 L28.5 15.8"/>
+      <path d="M10 6.4 L10 24.9"/>
+      <path d="M21 7.2 L21 25.65"/>
+    </g>
+    <!-- подкосы и линия кровли -->
+    <g stroke-width="2">
+      <path d="M10 18 L15.8 25.3"/>
+      <path d="M21 18.8 L26.8 26"/>
+      <path d="M2.5 24.4 L29.5 26.2"/>
+    </g>
+  </g>
+</svg>
