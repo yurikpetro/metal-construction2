@@ -7,6 +7,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends openssl sqlite3
 RUN mkdir -p /app/data
 
 FROM base AS deps
+# better-sqlite3 не поставляет готовый бинарник для этой версии Node и собирается
+# из исходников через node-gyp, которому нужны Python и компилятор C++.
+# Ставим их только здесь: в рантайм-образ (стадия runner) они не попадают,
+# туда копируется уже скомпилированный .node-аддон.
+RUN apt-get update && apt-get install -y --no-install-recommends build-essential python3 && rm -rf /var/lib/apt/lists/*
 COPY package.json package-lock.json ./
 RUN npm ci
 
