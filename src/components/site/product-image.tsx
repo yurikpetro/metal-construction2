@@ -7,11 +7,18 @@ export function ProductImage({
   alt,
   className,
   sizes,
+  eager,
 }: {
   src?: string | null;
   alt: string;
   className?: string;
   sizes?: string;
+  /**
+   * Для главного изображения на странице товара: оно почти всегда является
+   * LCP-элементом, поэтому грузим его сразу и с высоким приоритетом.
+   * (В Next 16 проп `priority` объявлен устаревшим в пользу loading/fetchPriority.)
+   */
+  eager?: boolean;
 }) {
   if (!src) {
     return (
@@ -33,6 +40,8 @@ export function ProductImage({
         alt={alt}
         fill
         sizes={sizes ?? "(max-width: 768px) 100vw, 400px"}
+        loading={eager ? "eager" : "lazy"}
+        fetchPriority={eager ? "high" : undefined}
         className="object-cover"
       />
     </div>

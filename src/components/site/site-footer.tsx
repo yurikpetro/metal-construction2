@@ -6,7 +6,7 @@ export function SiteFooter() {
 
   return (
     <footer className="border-t bg-secondary/40 mt-16">
-      <div className="mx-auto max-w-6xl px-4 py-10 grid gap-8 sm:grid-cols-3">
+      <div className="container-page py-10 grid gap-8 sm:grid-cols-3 xl:py-12">
         <div>
           <div className="font-semibold tracking-tight">{siteConfig.name}</div>
           <p className="mt-2 text-sm text-muted-foreground">
@@ -59,7 +59,7 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t">
-        <div className="mx-auto max-w-6xl px-4 py-4 text-xs text-muted-foreground">
+        <div className="container-page py-4 text-xs text-muted-foreground">
           © {year} {siteConfig.name}. Все права защищены. {siteConfig.legalName}, ИНН{" "}
           {siteConfig.inn}
         </div>

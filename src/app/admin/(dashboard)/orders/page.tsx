@@ -77,6 +77,7 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
       <form method="GET" className="mt-4 flex max-w-sm gap-2">
         {status && <input type="hidden" name="status" value={status} />}
         <Input
+          key={q}
           type="search"
           name="q"
           defaultValue={q}
@@ -110,7 +111,7 @@ export default async function AdminOrdersPage({ searchParams }: Props) {
                       href={`/admin/orders/${order.id}`}
                       className="block px-4 py-2.5 font-medium"
                     >
-                      №{order.orderNumber}
+                      №{order.id}
                     </Link>
                   </TableCell>
                   <TableCell>{formatDateTime(order.createdAt)}</TableCell>

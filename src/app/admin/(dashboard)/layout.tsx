@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { isAdminLoggedIn } from "@/lib/session";
 import { AdminHeader } from "@/components/admin/admin-header";
+
+// Админка закрыта авторизацией и запрещена в robots.txt — метатег добавлен
+// третьим уровнем защиты, чтобы страницы не попали в индекс ни при каких настройках.
+export const metadata: Metadata = {
+  title: { default: "Админка", template: "%s — админка" },
+  robots: { index: false, follow: false, nocache: true },
+};
 
 export default async function AdminDashboardLayout({
   children,

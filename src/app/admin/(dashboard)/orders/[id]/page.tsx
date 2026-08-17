@@ -15,7 +15,13 @@ interface Props {
 
 export default async function AdminOrderDetailPage({ params }: Props) {
   const { id } = await params;
-  const order = await getOrderById(id);
+  const orderId = Number(id);
+
+  if (!Number.isInteger(orderId)) {
+    notFound();
+  }
+
+  const order = await getOrderById(orderId);
 
   if (!order) {
     notFound();
@@ -26,7 +32,7 @@ export default async function AdminOrderDetailPage({ params }: Props) {
       <div>
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-semibold tracking-tight">
-            Заявка №{order.orderNumber}
+            Заявка №{order.id}
           </h1>
           <OrderStatusBadge status={order.status} />
         </div>

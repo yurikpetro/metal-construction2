@@ -117,7 +117,7 @@ export async function POST(request: NextRequest) {
 
   const [telegramOk, emailOk] = await Promise.all([
     sendTelegramMessage(
-      `Новая заявка №${order.orderNumber}\n` +
+      `Новая заявка №${order.id}\n` +
         `Имя: ${data.customerName}\n` +
         `Телефон: ${data.phone}\n` +
         `Адрес: ${data.address}\n` +
@@ -125,7 +125,7 @@ export async function POST(request: NextRequest) {
         `\n${itemsText}\n\nИтого: ${formatPrice(totalAmount)}`,
     ),
     sendOrderEmail({
-      orderNumber: order.orderNumber,
+      orderNumber: order.id,
       customerName: data.customerName,
       phone: data.phone,
       address: data.address,
@@ -140,5 +140,5 @@ export async function POST(request: NextRequest) {
     data: { notifiedTelegram: telegramOk, notifiedEmail: emailOk },
   });
 
-  return NextResponse.json({ orderNumber: order.orderNumber });
+  return NextResponse.json({ orderNumber: order.id });
 }

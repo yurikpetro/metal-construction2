@@ -31,6 +31,23 @@ export type ProductWithRelations = NonNullable<
   Awaited<ReturnType<typeof getProductBySlug>>
 >;
 
+/** Другие товары каталога — для блока перелинковки на странице товара. */
+export function getRelatedProducts(excludeId: string, take = 3) {
+  return prisma.product.findMany({
+    where: { isActive: true, id: { not: excludeId } },
+    orderBy: { sortOrder: "asc" },
+    take,
+    include: {
+      images: { orderBy: { sortOrder: "asc" }, take: 1 },
+      variants: {
+        where: { isActive: true },
+        orderBy: { sortOrder: "asc" },
+        select: { id: true },
+      },
+    },
+  });
+}
+
 export function getAllProductsForAdmin() {
   return prisma.product.findMany({
     orderBy: { sortOrder: "asc" },

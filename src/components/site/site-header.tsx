@@ -27,7 +27,7 @@ export function SiteHeader() {
   return (
     <>
       <div className="border-b bg-secondary/40">
-        <div className="mx-auto flex h-8 max-w-6xl items-center px-4 text-xs text-muted-foreground">
+        <div className="container-page flex h-8 items-center text-xs text-muted-foreground">
           <span className="inline-flex items-center gap-1">
             <MapPin className="size-3" />
             {siteConfig.city}
@@ -36,12 +36,15 @@ export function SiteHeader() {
       </div>
 
       <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
-          <Link href="/" className="font-semibold tracking-tight text-lg shrink-0">
+        <div className="container-page flex h-16 items-center justify-between gap-4">
+          <Link
+            href="/"
+            className="font-semibold tracking-tight text-lg shrink-0 xl:text-xl"
+          >
             {siteConfig.name}
           </Link>
 
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium">
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium xl:gap-8 xl:text-base">
             {NAV_LINKS.map((link) => (
               <Link
                 key={link.href}
@@ -56,7 +59,7 @@ export function SiteHeader() {
           <div className="flex items-center gap-1">
             <a
               href={siteConfig.phoneHref}
-              className="hidden lg:inline-flex items-center gap-2 text-sm font-medium text-foreground/80 hover:text-foreground mr-2"
+              className="hidden lg:inline-flex items-center gap-2 text-sm font-medium text-foreground/80 hover:text-foreground mr-2 xl:text-base"
             >
               <Phone className="size-4" />
               {siteConfig.phone}

@@ -29,6 +29,11 @@ export function ProductForm({
 }) {
   const action = mode === "create" ? createProductAction : updateProductAction;
   const [state, formAction, pending] = useActionState(action, initialState);
+  const [name, setName] = useState(product?.name ?? "");
+  const [description, setDescription] = useState(product?.description ?? "");
+  const [basePrice, setBasePrice] = useState(
+    product ? String(product.basePrice) : "",
+  );
   const [isActive, setIsActive] = useState(product?.isActive ?? true);
 
   return (
@@ -37,7 +42,13 @@ export function ProductForm({
 
       <div className="flex flex-col gap-1.5">
         <Label htmlFor="name">Название</Label>
-        <Input id="name" name="name" defaultValue={product?.name} required />
+        <Input
+          id="name"
+          name="name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          required
+        />
       </div>
 
       <div className="flex flex-col gap-1.5">
@@ -46,7 +57,8 @@ export function ProductForm({
           id="description"
           name="description"
           rows={4}
-          defaultValue={product?.description}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
           required
         />
       </div>
@@ -59,7 +71,8 @@ export function ProductForm({
           type="number"
           min={1}
           step={1}
-          defaultValue={product?.basePrice}
+          value={basePrice}
+          onChange={(e) => setBasePrice(e.target.value)}
           required
         />
         <p className="text-xs text-muted-foreground">

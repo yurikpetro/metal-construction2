@@ -1,6 +1,10 @@
 FROM node:22-slim AS base
 WORKDIR /app
-RUN apt-get update && apt-get install -y --no-install-recommends openssl && rm -rf /var/lib/apt/lists/*
+# sqlite3 — CLI для .backup (см. scripts/backup-db.sh), openssl — нужен Prisma
+RUN apt-get update && apt-get install -y --no-install-recommends openssl sqlite3 && rm -rf /var/lib/apt/lists/*
+# /app/data — том для файла SQLite (и в migrator, и в runner); создаём здесь,
+# чтобы каталог точно существовал до первого открытия базы
+RUN mkdir -p /app/data
 
 FROM base AS deps
 COPY package.json package-lock.json ./
@@ -9,6 +13,16 @@ RUN npm ci
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+# Переменные с префиксом NEXT_PUBLIC_ Next.js подставляет в код на этапе сборки,
+# а не читает в рантайме, поэтому их нужно передать build-аргументами — иначе
+# счётчик Яндекс.Метрики не подключится, а canonical/sitemap уедут на localhost.
+# Значения приходят из .env через docker-compose.yml.
+ARG NEXT_PUBLIC_SITE_URL
+ARG NEXT_PUBLIC_YANDEX_METRIKA_ID
+ENV NEXT_PUBLIC_SITE_URL=$NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_YANDEX_METRIKA_ID=$NEXT_PUBLIC_YANDEX_METRIKA_ID
+
 RUN npx prisma generate
 RUN npm run build
 
@@ -26,8 +40,12 @@ COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/src/generated/prisma ./src/generated/prisma
+# better-sqlite3 — нативный аддон с прекомпилированным .node-бинарником внутри
+# пакета; копируем его явно, а не полагаемся на автотрейсинг standalone-сборки
+# (для нативных биндингов он ненадёжен)
+COPY --from=builder --chown=nextjs:nodejs /app/node_modules/better-sqlite3 ./node_modules/better-sqlite3
 
-RUN mkdir -p /app/public/uploads && chown nextjs:nodejs /app/public/uploads
+RUN mkdir -p /app/public/uploads /app/data && chown nextjs:nodejs /app/public/uploads /app/data
 
 USER nextjs
 EXPOSE 3000

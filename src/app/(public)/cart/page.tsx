@@ -14,12 +14,12 @@ export default function CartPage() {
   const hydrated = useCartHydrated();
 
   if (!hydrated) {
-    return <div className="mx-auto max-w-4xl px-4 py-14" />;
+    return <div className="mx-auto w-full max-w-4xl px-4 sm:px-6 py-14" />;
   }
 
   if (items.length === 0) {
     return (
-      <div className="mx-auto max-w-4xl px-4 py-16 text-center">
+      <div className="mx-auto w-full max-w-4xl px-4 sm:px-6 py-16 text-center">
         <ShoppingCart className="mx-auto size-10 text-muted-foreground" />
         <h1 className="mt-4 text-xl font-semibold">Корзина пуста</h1>
         <p className="mt-2 text-muted-foreground">
@@ -35,7 +35,7 @@ export default function CartPage() {
   const total = cartTotal(items);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:py-14">
+    <div className="mx-auto w-full max-w-4xl px-4 sm:px-6 py-10 sm:py-14">
       <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
         Корзина
       </h1>

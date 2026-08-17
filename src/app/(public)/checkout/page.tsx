@@ -79,12 +79,12 @@ export default function CheckoutPage() {
   }
 
   if (!hydrated) {
-    return <div className="mx-auto max-w-4xl px-4 py-14" />;
+    return <div className="mx-auto w-full max-w-4xl px-4 sm:px-6 py-14" />;
   }
 
   if (items.length === 0) {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-16 text-center">
+      <div className="mx-auto w-full max-w-2xl px-4 sm:px-6 py-16 text-center">
         <h1 className="text-xl font-semibold">Корзина пуста</h1>
         <p className="mt-2 text-muted-foreground">
           Добавьте товары из каталога, чтобы оформить заявку.
@@ -99,7 +99,7 @@ export default function CheckoutPage() {
   const total = cartTotal(items);
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-10 sm:py-14">
+    <div className="mx-auto w-full max-w-4xl px-4 sm:px-6 py-10 sm:py-14">
       <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
         Оформление заказа
       </h1>

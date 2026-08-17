@@ -1,14 +1,19 @@
 import type { Metadata } from "next";
+import { Breadcrumbs } from "@/components/site/breadcrumbs";
 import { siteConfig } from "@/lib/site-config";
 
 export const metadata: Metadata = {
   title: "Политика конфиденциальности",
-  robots: { index: false },
+  alternates: { canonical: "/privacy" },
+  // Юридическая страница не нужна в выдаче, но ссылки с неё должны работать
+  robots: { index: false, follow: true },
 };
 
 export default function PrivacyPage() {
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10 sm:py-14">
+    <div className="mx-auto w-full max-w-2xl px-4 sm:px-6 py-10 sm:py-14">
+      <Breadcrumbs items={[{ name: "Политика конфиденциальности" }]} />
+
       <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
         Политика обработки персональных данных
       </h1>

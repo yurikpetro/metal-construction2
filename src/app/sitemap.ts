@@ -1,25 +1,59 @@
 import type { MetadataRoute } from "next";
 import { getActiveProducts } from "@/lib/products";
+import { absoluteUrl, SITE_URL } from "@/lib/seo";
 
+// Карта сайта строится по данным из БД и по адресу из окружения,
+// поэтому кешировать её на этапе сборки нельзя.
 export const dynamic = "force-dynamic";
-
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const products = await getActiveProducts();
 
+  // За дату обновления каталога берём самый свежий товар — так поисковик
+  // видит, что раздел меняется, и переобходит его чаще.
+  const lastProductUpdate = products.reduce<Date | undefined>(
+    (latest, product) =>
+      !latest || product.updatedAt > latest ? product.updatedAt : latest,
+    undefined,
+  );
+
   const staticRoutes: MetadataRoute.Sitemap = [
-    { url: SITE_URL, changeFrequency: "weekly", priority: 1 },
-    { url: `${SITE_URL}/catalog`, changeFrequency: "weekly", priority: 0.9 },
-    { url: `${SITE_URL}/documents`, changeFrequency: "monthly", priority: 0.6 },
-    { url: `${SITE_URL}/contacts`, changeFrequency: "monthly", priority: 0.5 },
+    {
+      // Без слэша на конце — ровно так, как rel="canonical" на главной,
+      // иначе поисковик увидит в карте сайта неканонический адрес
+      url: SITE_URL,
+      lastModified: lastProductUpdate,
+      changeFrequency: "weekly",
+      priority: 1,
+    },
+    {
+      url: absoluteUrl("/catalog"),
+      lastModified: lastProductUpdate,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: absoluteUrl("/documents"),
+      changeFrequency: "yearly",
+      priority: 0.6,
+    },
+    {
+      url: absoluteUrl("/contacts"),
+      changeFrequency: "yearly",
+      priority: 0.5,
+    },
   ];
 
-  const productRoutes: MetadataRoute.Sitemap = products.map((p) => ({
-    url: `${SITE_URL}/catalog/${p.slug}`,
-    lastModified: p.updatedAt,
+  // Картинки товаров указываем отдельно — это image sitemap,
+  // по нему фото попадают в Google Картинки и Яндекс.Картинки.
+  const productRoutes: MetadataRoute.Sitemap = products.map((product) => ({
+    url: absoluteUrl(`/catalog/${product.slug}`),
+    lastModified: product.updatedAt,
     changeFrequency: "weekly",
     priority: 0.8,
+    ...(product.images.length > 0 && {
+      images: product.images.map((image) => absoluteUrl(image.url)),
+    }),
   }));
 
   return [...staticRoutes, ...productRoutes];

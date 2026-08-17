@@ -19,9 +19,9 @@ export async function getOrders({
     const term = search.trim();
     const asNumber = Number(term);
     where.OR = [
-      { customerName: { contains: term, mode: "insensitive" } },
+      { customerName: { contains: term } },
       { phone: { contains: term } },
-      ...(!Number.isNaN(asNumber) ? [{ orderNumber: asNumber }] : []),
+      ...(Number.isInteger(asNumber) ? [{ id: asNumber }] : []),
     ];
   }
 
@@ -53,7 +53,7 @@ export async function getOrderStatusCounts(): Promise<Record<OrderStatus, number
   return counts;
 }
 
-export function getOrderById(id: string) {
+export function getOrderById(id: number) {
   return prisma.order.findUnique({
     where: { id },
     include: {

@@ -5,7 +5,7 @@ import { prisma } from "@/lib/db";
 import { ORDER_STATUS_TRANSITIONS } from "@/lib/order-status";
 import type { OrderStatus } from "@/generated/prisma/enums";
 
-export async function updateOrderStatusAction(orderId: string, toStatus: OrderStatus) {
+export async function updateOrderStatusAction(orderId: number, toStatus: OrderStatus) {
   const order = await prisma.order.findUnique({ where: { id: orderId } });
   if (!order) {
     throw new Error("Заявка не найдена");

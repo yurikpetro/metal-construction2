@@ -6,6 +6,11 @@ export function YandexMetrika() {
 
   return (
     <>
+      {/* Соединение с сервером счётчика открывается заранее — скрипт стартует быстрее
+          и не задерживает загрузку основного контента */}
+      <link rel="preconnect" href="https://mc.yandex.ru" />
+      <link rel="dns-prefetch" href="https://mc.yandex.ru" />
+
       <Script id="yandex-metrika" strategy="afterInteractive">
         {`
           (function(m,e,t,r,i,k,a){
@@ -18,7 +23,8 @@ export function YandexMetrika() {
           ym(${id}, "init", {
             clickmap: true,
             trackLinks: true,
-            accurateTrackBounce: true
+            accurateTrackBounce: true,
+            webvisor: true
           });
         `}
       </Script>

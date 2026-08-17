@@ -11,7 +11,7 @@ export function OrderStatusActions({
   orderId,
   status,
 }: {
-  orderId: string;
+  orderId: number;
   status: OrderStatus;
 }) {
   const [pending, startTransition] = useTransition();

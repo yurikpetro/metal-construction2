@@ -1,38 +1,28 @@
 services:
-  postgres:
-    image: postgres:16-alpine
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-
   migrate:
     build:
       context: .
       target: migrator
     env_file: .env
-    depends_on:
-      postgres:
-        condition: service_healthy
+    volumes:
+      - db_data:/app/data
 
   app:
     build:
       context: .
       target: runner
+      # NEXT_PUBLIC_*-переменные вшиваются в бандл при сборке, поэтому их
+      # передаём именно как build args (значения берутся из .env рядом с этим файлом)
+      args:
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+        NEXT_PUBLIC_YANDEX_METRIKA_ID: ${NEXT_PUBLIC_YANDEX_METRIKA_ID}
     restart: unless-stopped
     env_file: .env
     depends_on:
       migrate:
         condition: service_completed_successfully
     volumes:
+      - db_data:/app/data
       - uploads_data:/app/public/uploads
     expose:
       - "3000"
@@ -53,7 +43,7 @@ services:
       - app
 
 volumes:
-  postgres_data:
+  db_data:
   uploads_data:
   caddy_data:
   caddy_config:

@@ -6,7 +6,7 @@
 
 - Next.js 16 (App Router) + TypeScript
 - Tailwind CSS v4 + shadcn/ui
-- PostgreSQL + Prisma 7 (драйвер-адаптер `@prisma/adapter-pg`)
+- SQLite + Prisma 7 (драйвер-адаптер `@prisma/adapter-better-sqlite3`) — файл БД, отдельный сервер не нужен
 - Zustand — корзина (хранится в localStorage)
 - iron-session + bcrypt — авторизация админки
 - Telegram Bot API + Resend — уведомления о заявках
@@ -14,22 +14,20 @@
 
 ## Локальная разработка
 
+База — обычный файл SQLite рядом со схемой, поднимать ничего не нужно (ни Docker, ни отдельный сервер БД).
+
 1. Установите зависимости:
    ```bash
    npm install
    ```
-2. Скопируйте `.env.example` в `.env` (уже сделано в репозитории для локальной разработки — значения по умолчанию рассчитаны на локальный Postgres из `docker-compose.dev.yml`).
-3. Поднимите локальный Postgres:
-   ```bash
-   docker compose -f docker-compose.dev.yml up -d
-   ```
-4. Примените миграции, сгенерируйте клиент и засейте демо-данные:
+2. Скопируйте `.env.example` в `.env` (уже сделано в репозитории для локальной разработки).
+3. Примените миграции, сгенерируйте клиент и засейте демо-данные:
    ```bash
    npx prisma migrate dev
    npx prisma generate
    npx prisma db seed
    ```
-5. Запустите дев-сервер:
+4. Запустите дев-сервер:
    ```bash
    npm run dev
    ```
@@ -40,10 +38,16 @@
 
 См. `.env.example` (локально) и `.env.production.example` (для сервера) — там же комментарии, что откуда берётся: Telegram-токен и chat id от @BotFather, API-ключ Resend с resend.com и т.д.
 
+Отдельно про адрес сайта: `NEXT_PUBLIC_SITE_URL` вшивается в сборку (передаётся build-аргументом в `docker-compose.yml`), а `SITE_URL` читается в рантайме. Держите их одинаковыми и пересобирайте образ при смене домена.
+
+## SEO
+
+Метатеги, structured data, `robots.txt`, `sitemap.xml` и OG-картинка настроены в коде. Что нужно сделать руками — подтверждение прав в Яндекс.Вебмастере и Search Console, регион в Вебмастере, счётчик Метрики, фото товаров, справочники — собрано в чек-листе [`SEO.md`](SEO.md).
+
 ## Деплой на VPS
 
 1. Установите Docker и Docker Compose на сервере.
-2. Склонируйте репозиторий, скопируйте `.env.production.example` → `.env` и заполните реальными значениями (пароль БД, домен, секреты, токены).
+2. Склонируйте репозиторий, скопируйте `.env.production.example` → `.env` и заполните реальными значениями (домен, секреты, токены).
 3. Убедитесь, что DNS-запись домена указывает на IP сервера (нужно для авто-HTTPS через Caddy).
 4. Запустите:
    ```bash
@@ -56,4 +60,4 @@
    docker compose up -d --build
    ```
 
-Бэкапы БД — см. `scripts/backup-db.sh` (ежедневный `pg_dump` по cron с ротацией).
+Бэкапы БД — см. `scripts/backup-db.sh` (ежедневный консистентный снимок SQLite через `.backup` по cron, с ротацией).

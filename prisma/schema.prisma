@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
 }
 
 enum OrderStatus {
@@ -61,8 +61,10 @@ model ProductVariant {
 }
 
 model Order {
-  id            String      @id @default(cuid())
-  orderNumber   Int         @unique @default(autoincrement())
+  // Обычный autoincrement Int вместо cuid: в SQLite autoincrement можно
+  // повесить только на первичный ключ, а этот же номер — человекочитаемый
+  // номер заявки ("Заявка №42"), так что объединяем в одно поле.
+  id            Int         @id @default(autoincrement())
   customerName  String
   phone         String
   address       String
@@ -84,7 +86,7 @@ model Order {
 
 model OrderItem {
   id            String  @id @default(cuid())
-  orderId       String
+  orderId       Int
   productId     String?
   variantId     String?
   productName   String
@@ -103,7 +105,7 @@ model OrderItem {
 
 model OrderStatusHistory {
   id         String       @id @default(cuid())
-  orderId    String
+  orderId    Int
   fromStatus OrderStatus?
   toStatus   OrderStatus
   changedAt  DateTime     @default(now())
