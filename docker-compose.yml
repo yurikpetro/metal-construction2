@@ -4,6 +4,11 @@ services:
       context: .
       target: migrator
     env_file: .env
+    # Контейнер миграций работает от root и создаёт файл базы с владельцем root,
+    # а приложение запускается от nextjs (uid 1001) — без chown любая запись
+    # в базу падает с SQLITE_READONLY (чтение при этом работает, поэтому
+    # проблема проявляется только при сохранении в админке).
+    command: sh -c "npx prisma migrate deploy && chown -R 1001:1001 /app/data"
     volumes:
       - db_data:/app/data
 
