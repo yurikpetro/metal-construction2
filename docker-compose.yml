@@ -18,6 +18,11 @@ services:
         NEXT_PUBLIC_YANDEX_METRIKA_ID: ${NEXT_PUBLIC_YANDEX_METRIKA_ID}
     restart: unless-stopped
     env_file: .env
+    environment:
+      # IPv4-адреса api.telegram.org с российского хостинга недоступны, IPv6 —
+      # работает. Просим Node пробовать IPv6-адрес первым, иначе каждая отправка
+      # уведомления ждёт таймаута на IPv4 (fetch в src/lib/notifications/*).
+      NODE_OPTIONS: --dns-result-order=ipv6first
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -47,3 +52,13 @@ volumes:
   uploads_data:
   caddy_data:
   caddy_config:
+
+# IPv6 в сети контейнеров нужен для исходящих запросов к API Telegram:
+# его IPv4-адреса с этого хостинга не отвечают. Подсеть — приватная (ULA),
+# наружу Docker выпускает трафик через NAT, как и для IPv4.
+networks:
+  default:
+    enable_ipv6: true
+    ipam:
+      config:
+        - subnet: fd00:c026::/64
