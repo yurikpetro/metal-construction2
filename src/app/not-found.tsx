@@ -32,8 +32,7 @@ export default function NotFound() {
           </h1>
           <p className="mt-3 text-muted-foreground">
             Возможно, товар снят с продажи или ссылка устарела. Актуальные
-            кровельные ограждения, снегозадержатели, мостики и лестницы — в
-            каталоге.
+            кровельные ограждения и костыли — в каталоге.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <Link href="/catalog" className={buttonVariants({ size: "lg" })}>

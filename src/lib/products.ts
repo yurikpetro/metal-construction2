@@ -42,7 +42,7 @@ export function getRelatedProducts(excludeId: string, take = 3) {
       variants: {
         where: { isActive: true },
         orderBy: { sortOrder: "asc" },
-        select: { id: true },
+        select: { name: true, price: true },
       },
     },
   });

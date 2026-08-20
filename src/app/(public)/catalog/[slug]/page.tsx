@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BadgeCheck, FileText, Phone, Truck, Wrench } from "lucide-react";
+import { FileText, Phone, Truck } from "lucide-react";
 import { ProductGallery } from "@/components/site/product-gallery";
 import { AddToCartForm } from "@/components/site/add-to-cart-form";
-import { ProductCard } from "@/components/site/product-card";
+import {
+  ProductList,
+  toProductCardData,
+} from "@/components/site/product-list";
 import { Breadcrumbs } from "@/components/site/breadcrumbs";
 import { JsonLd } from "@/components/site/json-ld";
 import { getProductBySlug, getRelatedProducts } from "@/lib/products";
@@ -106,18 +109,10 @@ export default async function ProductPage({ params }: Props) {
             />
           </div>
 
+          {/* Сертификат и паспорт изделия оформлены на кровельные ограждения,
+              поэтому в общих буллетах формулировка привязана к ним, а не ко
+              всему каталогу. */}
           <ul className="mt-8 flex flex-col gap-3 border-t pt-6 text-sm text-muted-foreground xl:text-base">
-            <li className="flex items-start gap-2.5">
-              <BadgeCheck className="mt-0.5 size-4 shrink-0 text-primary" />
-              <span>
-                Сертифицированная продукция — при отгрузке передаём паспорт
-                изделия и копии{" "}
-                <Link href="/documents" className="text-primary hover:underline">
-                  сертификатов
-                </Link>
-                .
-              </span>
-            </li>
             <li className="flex items-start gap-2.5">
               <Truck className="mt-0.5 size-4 shrink-0 text-primary" />
               <span>
@@ -127,23 +122,27 @@ export default async function ProductPage({ params }: Props) {
               </span>
             </li>
             <li className="flex items-start gap-2.5">
-              <Wrench className="mt-0.5 size-4 shrink-0 text-primary" />
+              <FileText className="mt-0.5 size-4 shrink-0 text-primary" />
               <span>
-                Секционная конструкция: монтаж на кровельные кронштейны без
-                спецтехники, порядок установки описан в паспорте изделия.
+                Документы на кровельные ограждения — сертификат соответствия,
+                протокол испытаний и паспорт изделия — лежат в разделе{" "}
+                <Link href="/documents" className="text-primary hover:underline">
+                  «Документы и сертификаты»
+                </Link>
+                , копии передаём при отгрузке.
               </span>
             </li>
             <li className="flex items-start gap-2.5">
               <Phone className="mt-0.5 size-4 shrink-0 text-primary" />
               <span>
-                Не уверены в комплектации? Позвоните{" "}
+                Не уверены в выборе? Позвоните{" "}
                 <a
                   href={siteConfig.phoneHref}
                   className="text-primary hover:underline"
                 >
                   {siteConfig.phone}
                 </a>{" "}
-                — поможем рассчитать количество секций.
+                — поможем подобрать исполнение и посчитать количество.
               </span>
             </li>
           </ul>
@@ -168,8 +167,8 @@ export default async function ProductPage({ params }: Props) {
             согласуются отдельно.
           </p>
           <p>
-            К каждой партии прилагается паспорт изделия с техническими
-            характеристиками, требованиями к монтажу, хранению и
+            К партии кровельных ограждений прилагается паспорт изделия с
+            техническими характеристиками, требованиями к монтажу, хранению и
             транспортировке, а также копии сертификата соответствия и протокола
             испытаний. Скачать их можно заранее в разделе{" "}
             <Link href="/documents" className="text-primary hover:underline">
@@ -185,7 +184,7 @@ export default async function ProductPage({ params }: Props) {
         <section className="mt-14 xl:mt-16">
           <div className="mb-6 flex flex-wrap items-end justify-between gap-3 xl:mb-8">
             <h2 className="text-xl font-semibold tracking-tight xl:text-2xl">
-              Другие элементы безопасности кровли
+              Смотрите также
             </h2>
             <Link
               href="/catalog"
@@ -194,21 +193,7 @@ export default async function ProductPage({ params }: Props) {
               Весь каталог
             </Link>
           </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-8">
-            {related.map((p) => (
-              <ProductCard
-                key={p.id}
-                product={{
-                  slug: p.slug,
-                  name: p.name,
-                  description: p.description,
-                  basePrice: p.basePrice,
-                  hasVariants: p.variants.length > 0,
-                  imageUrl: p.images[0]?.url ?? null,
-                }}
-              />
-            ))}
-          </div>
+          <ProductList products={related.map(toProductCardData)} />
         </section>
       )}
     </div>

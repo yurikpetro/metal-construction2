@@ -8,12 +8,14 @@ import {
   PackageCheck,
   Phone,
   ShieldCheck,
-  Snowflake,
   Truck,
   Wrench,
 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
-import { ProductCard } from "@/components/site/product-card";
+import {
+  ProductList,
+  toProductCardData,
+} from "@/components/site/product-list";
 import { HeroGraphic } from "@/components/site/hero-graphic";
 import { JsonLd } from "@/components/site/json-ld";
 import { getActiveProducts } from "@/lib/products";
@@ -32,7 +34,7 @@ const BENEFITS = [
     icon: ShieldCheck,
     title: "Безопасность на высоте",
     description:
-      "Ограждения и снегозадержатели снижают риск при обслуживании и ремонте кровли.",
+      "Ограждение по периметру кровли снижает риск при обслуживании и ремонте крыши.",
   },
   {
     icon: PackageCheck,
@@ -45,33 +47,6 @@ const BENEFITS = [
     title: "Простой монтаж",
     description:
       "Секционная конструкция устанавливается без специальной техники и подготовки.",
-  },
-];
-
-const PRODUCT_TYPES = [
-  {
-    icon: ShieldCheck,
-    title: "Кровельные ограждения",
-    description:
-      "Сварные секции в исполнениях Н600, Н900 и Н1200 при стандартной длине секции L3000 мм (3 метра) — основной элемент безопасности скатной кровли. Крепятся к кровельным кронштейнам по всему периметру или на участках выхода на крышу.",
-  },
-  {
-    icon: Snowflake,
-    title: "Снегозадержатели",
-    description:
-      "Трубчатые конструкции, которые удерживают снег на кровле и не дают ему сходить лавиной на водостоки, отмостку и людей внизу.",
-  },
-  {
-    icon: PackageCheck,
-    title: "Кровельные мостики",
-    description:
-      "Переходные площадки для безопасного передвижения по кровле к дымоходам, вентиляции и антеннам без риска повредить покрытие.",
-  },
-  {
-    icon: Wrench,
-    title: "Кровельные и фасадные лестницы",
-    description:
-      "Конструкции для подъёма на крышу и перехода между скатами разной высоты — в одном комплекте с ограждениями и мостиками.",
   },
 ];
 
@@ -94,7 +69,7 @@ const ORDER_STEPS = [
   {
     title: "Отгружаем с документами",
     description:
-      "Вместе с товаром передаём паспорт изделия и копии сертификатов на продукцию.",
+      "Передаём паспорт изделия и копии сертификата соответствия на ограждения.",
   },
 ];
 
@@ -115,7 +90,7 @@ export default async function HomePage() {
             ? [
                 itemListSchema(
                   products,
-                  "Кровельные ограждения и снегозадержатели",
+                  "Кровельные ограждения и кровельные костыли",
                 ),
               ]
             : []),
@@ -126,16 +101,15 @@ export default async function HomePage() {
         <div className="grid items-center gap-8 sm:grid-cols-2 xl:gap-14">
           <div>
             <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl xl:text-5xl">
-              Кровельные ограждения и снегозадержатели в{" "}
+              Кровельные ограждения и кровельные костыли в{" "}
               {siteConfig.cityLocative}
             </h1>
             <p className="mt-4 text-lg text-muted-foreground xl:mt-6 xl:text-xl">
-              Изготавливаем и продаём элементы безопасности кровли: ограждения
-              в исполнениях Н600, Н900 и Н1200 длиной L3000 мм, трубчатые
-              снегозадержатели, кровельные мостики и лестницы.
-              Сертифицированная продукция. Производство в{" "}
-              {siteConfig.regionLocative}: самовывоз с производства или
-              отправка транспортными компаниями по договорённости.
+              Изготавливаем сварные кровельные ограждения в исполнениях Н600,
+              Н900 и Н1200 длиной L3000 мм и Т-образные кровельные костыли.
+              Сертифицированная продукция. Самовывоз с производства в{" "}
+              {siteConfig.regionLocative} или отправка транспортными компаниями
+              по договорённости.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link href="/catalog" className={buttonVariants({ size: "lg" })}>
@@ -193,11 +167,11 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {products.length > 0 && (
-        <section className="container-page py-12 sm:py-16 xl:py-20">
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-3 xl:mb-8">
+      <section className="border-t bg-secondary/30">
+        <div className="container-page py-12 sm:py-16 xl:py-20">
+          <div className="flex flex-wrap items-end justify-between gap-3">
             <h2 className="text-2xl font-semibold tracking-tight xl:text-3xl">
-              Каталог кровельных ограждений и снегозадержателей
+              Что мы производим
             </h2>
             <Link
               href="/catalog"
@@ -206,53 +180,24 @@ export default async function HomePage() {
               Весь каталог
             </Link>
           </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-8">
-            {products.map((p) => (
-              <ProductCard
-                key={p.id}
-                product={{
-                  slug: p.slug,
-                  name: p.name,
-                  description: p.description,
-                  basePrice: p.basePrice,
-                  hasVariants: p.variants.length > 0,
-                  imageUrl: p.images[0]?.url ?? null,
-                }}
-              />
-            ))}
-          </div>
-        </section>
-      )}
-
-      <section className="border-t bg-secondary/30">
-        <div className="container-page py-12 sm:py-16 xl:py-20">
-          <h2 className="text-2xl font-semibold tracking-tight xl:text-3xl">
-            Что мы производим
-          </h2>
           <p className="mt-2 max-w-3xl text-muted-foreground xl:mt-3 xl:text-lg">
-            Все конструкции — сварные металлические, с порошковой окраской.
-            Их подбирают комплектом под конкретную кровлю: ограждение по
-            периметру, снегозадержатели над входами и водостоками, мостики
-            и лестницы для доступа к оборудованию.
+            Основная позиция — секционные кровельные ограждения из трубы
+            Ø25 мм со стенкой 1 мм: исполнения Н600, Н900 и Н1200, длина
+            секции L3000 мм. Их ставят по периметру кровли и на участках
+            выхода на крышу, монтаж — на кровельные кронштейны, без
+            спецтехники. Сопутствующая позиция — Т-образные кровельные
+            костыли для крепления карнизного свеса.
           </p>
-          <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:mt-10 xl:gap-8">
-            {PRODUCT_TYPES.map((type) => (
-              <div
-                key={type.title}
-                className="flex gap-4 rounded-lg border bg-card p-5 xl:gap-5 xl:p-6"
-              >
-                <div className="h-fit rounded-md bg-primary/10 p-2 text-primary">
-                  <type.icon className="size-5" />
-                </div>
-                <div>
-                  <h3 className="font-medium xl:text-lg">{type.title}</h3>
-                  <p className="mt-1.5 text-sm text-muted-foreground xl:text-base">
-                    {type.description}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
+          {products.length > 0 ? (
+            <ProductList
+              products={products.map(toProductCardData)}
+              className="mt-8 xl:mt-10"
+            />
+          ) : (
+            <p className="mt-8 text-muted-foreground">
+              Товары скоро появятся.
+            </p>
+          )}
         </div>
       </section>
 
@@ -314,11 +259,11 @@ export default async function HomePage() {
 
           <div className="mt-10 rounded-lg border bg-card p-6 text-center xl:mt-12 xl:p-8">
             <h2 className="text-xl font-semibold tracking-tight xl:text-2xl">
-              Не нашли нужную конструкцию?
+              Нужна помощь с выбором?
             </h2>
             <p className="mt-2 text-sm text-muted-foreground xl:text-base">
-              Позвоните — подберём комплект элементов безопасности под вашу
-              кровлю и рассчитаем стоимость заказа.
+              Позвоните — подберём исполнение ограждения под вашу кровлю,
+              посчитаем количество секций и костылей, назовём итоговую сумму.
             </p>
             <div className="mt-5 flex flex-wrap justify-center gap-3">
               <a
