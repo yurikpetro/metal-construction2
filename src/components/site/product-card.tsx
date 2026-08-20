@@ -17,9 +17,11 @@ export interface ProductCardData {
 /**
  * `grid` — компактная карточка для сетки из трёх и более товаров;
  * `wide` — большая карточка основного товара (фото, описание, исполнения, цена);
- * `compact` — строка для сопутствующей позиции.
+ * `secondary` — карточка сопутствующей позиции: рядом с основным товаром
+ * (от lg) она вертикальная с крупным фото, а в одну колонку на узких
+ * экранах — горизонтальная, чтобы не спорить с основным товаром.
  */
-export type ProductCardLayout = "grid" | "wide" | "compact";
+export type ProductCardLayout = "grid" | "wide" | "secondary";
 
 export function ProductCard({
   product,
@@ -86,29 +88,32 @@ export function ProductCard({
     );
   }
 
-  if (layout === "compact") {
+  if (layout === "secondary") {
     return (
       <Link
         href={href}
-        className="group flex items-center gap-4 rounded-lg border bg-card p-3 transition-shadow hover:shadow-md xl:p-4"
+        className="group flex flex-1 gap-4 overflow-hidden rounded-lg border bg-card p-3 transition-shadow hover:shadow-md lg:flex-col lg:gap-0 lg:p-0"
       >
         <ProductImage
           src={product.imageUrl}
           alt={product.name}
-          className="size-16 shrink-0 rounded-md sm:size-20"
-          sizes="80px"
+          className="h-24 w-24 shrink-0 rounded-md sm:h-28 sm:w-28 lg:aspect-3/2 lg:h-auto lg:w-full lg:rounded-none"
+          sizes="(max-width: 1024px) 120px, 30vw"
         />
-        <div className="min-w-0 flex-1">
-          <h3 className="font-medium leading-snug group-hover:text-primary">
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5 lg:p-5">
+          <h3 className="font-medium leading-snug group-hover:text-primary lg:text-lg">
             {product.name}
           </h3>
-          <p className="hidden text-sm text-muted-foreground sm:line-clamp-2 sm:block">
+          <p className="line-clamp-3 text-sm text-muted-foreground">
             {product.description}
           </p>
-        </div>
-        <div className="flex shrink-0 items-center gap-3">
-          {price}
-          <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+          <div className="mt-auto flex items-center justify-between gap-3 pt-2">
+            {price}
+            <span className="inline-flex items-center gap-1 text-sm font-medium text-primary">
+              Подробнее
+              <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+            </span>
+          </div>
         </div>
       </Link>
     );

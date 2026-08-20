@@ -4,10 +4,10 @@ import { cn } from "@/lib/utils";
 /**
  * Список товаров подстраивается под размер ассортимента.
  *
- * Пока позиций одна-две, сетка из узких карточек выглядит недоделанной,
- * поэтому первый товар (по sortOrder) показываем большой карточкой как
- * основной, а остальные — строкой «сопутствующая позиция». Как только
- * товаров станет три и больше, включается обычная сетка.
+ * Три позиции и больше — обычная сетка. Две — основной товар большой
+ * карточкой на две трети ширины, сопутствующая позиция рядом в правой
+ * колонке (от lg), чтобы ряд заполнял ширину секции, а не оставлял пустоту.
+ * Одна — большая карточка на всю ширину.
  */
 export function ProductList({
   products,
@@ -34,25 +34,32 @@ export function ProductList({
   const [main, ...rest] = products;
   if (!main) return null;
 
+  if (rest.length === 0) {
+    return (
+      <div className={className}>
+        <ProductCard product={main} layout="wide" />
+      </div>
+    );
+  }
+
   return (
-    <div className={cn("flex max-w-4xl flex-col gap-6", className)}>
-      <ProductCard product={main} layout="wide" />
-      {rest.length > 0 && (
-        <div className="flex flex-col gap-3">
-          <div className="text-sm font-medium text-muted-foreground">
-            {rest.length === 1
-              ? "Сопутствующая позиция"
-              : "Сопутствующие позиции"}
-          </div>
-          {rest.map((product) => (
-            <ProductCard
-              key={product.slug}
-              product={product}
-              layout="compact"
-            />
-          ))}
-        </div>
+    <div
+      className={cn(
+        "grid items-stretch gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] xl:gap-8",
+        className,
       )}
+    >
+      <ProductCard product={main} layout="wide" />
+      <div className="flex flex-col gap-3">
+        <div className="text-sm font-medium text-muted-foreground">
+          {rest.length === 1
+            ? "Сопутствующая позиция"
+            : "Сопутствующие позиции"}
+        </div>
+        {rest.map((product) => (
+          <ProductCard key={product.slug} product={product} layout="secondary" />
+        ))}
+      </div>
     </div>
   );
 }
