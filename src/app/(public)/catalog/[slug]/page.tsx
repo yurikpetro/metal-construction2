@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // иначе у товаров с длинным описанием цена не влезала бы в сниппет.
   const description =
     `${truncate(product.description, 130)} Цена от ${formatPrice(minPrice)}. ` +
-    `${siteConfig.city} — изготовление и продажа, доставка по России.`;
+    `${siteConfig.city} — изготовление и продажа, отправка транспортными компаниями.`;
   const title = `${product.name} — купить в ${siteConfig.cityLocative}`;
   const url = `/catalog/${product.slug}`;
 
@@ -121,8 +121,9 @@ export default async function ProductPage({ params }: Props) {
             <li className="flex items-start gap-2.5">
               <Truck className="mt-0.5 size-4 shrink-0 text-primary" />
               <span>
-                Отгрузка из {siteConfig.regionLocative}, доставка по{" "}
-                {siteConfig.city}, краю и всей России транспортными компаниями.
+                Отгрузка с производства в {siteConfig.regionLocative}:
+                самовывоз или отправка транспортной компанией по
+                договорённости — своей доставки у нас нет.
               </span>
             </li>
             <li className="flex items-start gap-2.5">
@@ -151,14 +152,20 @@ export default async function ProductPage({ params }: Props) {
 
       <section className="mt-14 max-w-3xl xl:mt-16">
         <h2 className="text-xl font-semibold tracking-tight xl:text-2xl">
-          Оплата, доставка и документы
+          Оплата, отправка и документы
         </h2>
         <div className="mt-4 flex flex-col gap-4 text-sm leading-relaxed text-muted-foreground xl:text-base">
           <p>
             Оплата на сайте не требуется: вы оставляете заявку, менеджер
             перезванивает, подтверждает наличие и комплектацию, после чего
-            согласовывает способ оплаты и доставки. Продавец —{" "}
+            согласовывает оплату и способ получения. Продавец —{" "}
             {siteConfig.legalName}, ИНН {siteConfig.inn}.
+          </p>
+          <p>
+            Своей доставки у нас нет: заказ можно забрать самовывозом с
+            производства или отправить транспортной компанией — сроки и
+            стоимость перевозки зависят от компании и направления и
+            согласуются отдельно.
           </p>
           <p>
             К каждой партии прилагается паспорт изделия с техническими

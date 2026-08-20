@@ -134,6 +134,10 @@ export default function CheckoutPage() {
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="address">Адрес доставки</Label>
             <Input id="address" {...register("address")} autoComplete="street-address" />
+            <p className="text-sm text-muted-foreground">
+              Город и адрес или терминал транспортной компании — способ
+              отправки согласуем по телефону.
+            </p>
             {errors.address && (
               <p className="text-sm text-destructive">{errors.address.message}</p>
             )}

@@ -10,7 +10,7 @@ const TITLE = `Контакты — кровельные ограждения в
 const DESCRIPTION =
   `Телефон ${siteConfig.phone}, почта и адрес производства: ${siteConfig.address}, ` +
   `${siteConfig.region}. Ответим на вопросы по кровельным ограждениям, ` +
-  "снегозадержателям и доставке.";
+  "снегозадержателям и отправке заказа.";
 
 export const metadata: Metadata = {
   title: { absolute: TITLE },
@@ -41,7 +41,7 @@ export default function ContactsPage() {
       </h1>
       <p className="mt-2 text-muted-foreground xl:mt-3 xl:text-lg">
         Свяжитесь с нами напрямую или оформите заявку из каталога — мы
-        перезвоним, чтобы уточнить детали заказа и доставки.
+        перезвоним, чтобы уточнить детали заказа и отправки.
       </p>
 
       <div className="mt-8 flex flex-col gap-4">
@@ -70,10 +70,11 @@ export default function ContactsPage() {
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground xl:text-base">
           Производство находится в {siteConfig.regionLocative}:{" "}
-          {siteConfig.address}. Кровельные ограждения, снегозадержатели,
-          мостики и лестницы отгружаем в {siteConfig.cityLocative} и по краю,
-          в другие регионы отправляем транспортными компаниями. Условия и
-          стоимость доставки менеджер подтверждает при обработке заявки.
+          {siteConfig.address} — это небольшой цех, конструкции изготавливаем
+          сами. Своей доставки у нас нет: готовый заказ можно забрать
+          самовывозом с производства или отправить транспортной компанией —
+          по договорённости, в том числе в другие регионы. Условия и
+          стоимость перевозки менеджер согласует при обработке заявки.
         </p>
       </section>
 

@@ -24,7 +24,7 @@ export default async function CheckoutSuccessPage({ searchParams }: Props) {
       </h1>
       <p className="mt-3 text-muted-foreground">
         Мы свяжемся с вами по указанному телефону в ближайшее время, чтобы
-        уточнить детали заказа, оплату и доставку. Если у вас срочный вопрос —
+        уточнить детали заказа, оплату и отправку. Если у вас срочный вопрос —
         позвоните нам сами: {siteConfig.phone}.
       </p>
       <Link href="/catalog" className={buttonVariants({ className: "mt-8" })}>
