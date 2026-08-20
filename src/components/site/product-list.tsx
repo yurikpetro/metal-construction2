@@ -34,9 +34,11 @@ export function ProductList({
   const [main, ...rest] = products;
   if (!main) return null;
 
+  // Одна позиция (например, блок перелинковки на странице товара): карточку
+  // на всю ширину контейнера растягивать не нужно — получается баннер.
   if (rest.length === 0) {
     return (
-      <div className={className}>
+      <div className={cn("max-w-3xl", className)}>
         <ProductCard product={main} layout="wide" />
       </div>
     );
