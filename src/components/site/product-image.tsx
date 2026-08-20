@@ -8,6 +8,7 @@ export function ProductImage({
   className,
   sizes,
   eager,
+  fit = "contain",
 }: {
   src?: string | null;
   alt: string;
@@ -19,6 +20,12 @@ export function ProductImage({
    * (В Next 16 проп `priority` объявлен устаревшим в пользу loading/fetchPriority.)
    */
   eager?: boolean;
+  /**
+   * По умолчанию `contain`: фото товара вписывается в бокс целиком и
+   * центрируется. Для металлоконструкций и чертежей это важнее заполнения
+   * рамки — при `cover` у снимка обрезаются края, а у схемы пропадают размеры.
+   */
+  fit?: "cover" | "contain";
 }) {
   if (!src) {
     return (
@@ -42,7 +49,10 @@ export function ProductImage({
         sizes={sizes ?? "(max-width: 768px) 100vw, 400px"}
         loading={eager ? "eager" : "lazy"}
         fetchPriority={eager ? "high" : undefined}
-        className="object-cover"
+        className={cn(
+          "object-center",
+          fit === "cover" ? "object-cover" : "object-contain",
+        )}
       />
     </div>
   );
