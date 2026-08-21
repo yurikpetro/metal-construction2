@@ -41,6 +41,7 @@ export function AddToCartForm({
     [variants, variantId],
   );
   const price = selectedVariant?.price ?? basePrice;
+  const total = price * quantity;
 
   function handleAdd() {
     addItem(
@@ -56,7 +57,9 @@ export function AddToCartForm({
       quantity,
     );
     toast.success("Добавлено в корзину", {
-      description: selectedVariant ? `${name} — ${selectedVariant.name}` : name,
+      description:
+        `${selectedVariant ? `${name} — ${selectedVariant.name}` : name}` +
+        ` · ${quantity} × ${formatPrice(price)} = ${formatPrice(total)}`,
       action: {
         label: "Перейти в корзину",
         onClick: () => {
@@ -120,6 +123,24 @@ export function AddToCartForm({
           <ShoppingCart className="size-4" />
           Добавить в корзину
         </Button>
+      </div>
+
+      {/* Сумма по счётчику: при количестве больше одного её иначе приходится
+          считать в голове — а решение о заказе принимают именно по ней.
+          aria-live, чтобы скринридер озвучивал пересчёт при клике по +/−. */}
+      <div
+        className="flex items-baseline justify-between gap-3 rounded-md bg-secondary/50 px-3 py-2 text-sm"
+        aria-live="polite"
+      >
+        <span className="text-muted-foreground">
+          {quantity} × {formatPrice(price)}
+        </span>
+        <span>
+          Сумма:{" "}
+          <span className="text-base font-semibold text-foreground">
+            {formatPrice(total)}
+          </span>
+        </span>
       </div>
 
       <Link

@@ -49,10 +49,13 @@ export function ProductCard({
         href={href}
         className="group grid overflow-hidden rounded-lg border bg-card transition-shadow hover:shadow-md sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]"
       >
+        {/* Бокс фиксированного соотношения и по центру колонки: если растянуть
+            панель на всю высоту карточки, она становится портретной, и при
+            вписывании фото остаётся широкая серая рамка сверху и снизу. */}
         <ProductImage
           src={product.imageUrl}
           alt={product.name}
-          className="aspect-4/3 w-full sm:h-full"
+          className="aspect-4/3 w-full sm:self-center"
           sizes="(max-width: 640px) 100vw, 40vw"
         />
         <div className="flex flex-col gap-3 p-5 xl:p-6">
