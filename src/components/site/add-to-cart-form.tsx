@@ -107,7 +107,17 @@ export function AddToCartForm({
           >
             <Minus className="size-4" />
           </Button>
-          <span className="w-10 text-center tabular-nums">{quantity}</span>
+          <input
+            type="number"
+            min={1}
+            value={quantity}
+            onChange={(e) => {
+              const val = parseInt(e.target.value, 10);
+              setQuantity(Number.isNaN(val) ? 1 : Math.max(1, val));
+            }}
+            aria-label="Количество"
+            className="w-16 border-0 bg-transparent text-center tabular-nums focus-visible:outline-none [-moz-appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+          />
           <Button
             type="button"
             variant="ghost"
