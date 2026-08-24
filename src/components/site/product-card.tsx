@@ -47,22 +47,27 @@ export function ProductCard({
     return (
       <Link
         href={href}
-        className="group grid overflow-hidden rounded-lg border bg-card transition-shadow hover:shadow-md sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]"
+        className="group grid overflow-hidden rounded-lg border bg-card transition-shadow hover:shadow-md sm:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]"
       >
-        {/* Бокс фиксированного соотношения и по центру колонки: если растянуть
-            панель на всю высоту карточки, она становится портретной, и при
-            вписывании фото остаётся широкая серая рамка сверху и снизу. */}
+        {/* На узких экранах — фиксированное 4:3 сверху. От sm колонка с фото
+            растягивается на всю высоту карточки (та же высота, что и у
+            соседней колонки с текстом), поэтому фото не остаётся мелким
+            посреди пустой рамки. */}
         <ProductImage
           src={product.imageUrl}
           alt={product.name}
-          className="aspect-4/3 w-full sm:self-center"
-          sizes="(max-width: 640px) 100vw, 40vw"
+          className="aspect-4/3 w-full sm:aspect-auto sm:h-full"
+          sizes="(max-width: 640px) 100vw, 60vw"
         />
         <div className="flex flex-col gap-3 p-5 xl:p-6">
           <h3 className="text-lg font-medium leading-snug group-hover:text-primary xl:text-xl">
             {product.name}
           </h3>
-          <p className="line-clamp-4 text-sm text-muted-foreground xl:text-base">
+          {/* Лимит намного выше, чем у компактных карточек: колонка с текстом
+              и так растягивается по высоте фото, места обычно хватает на
+              весь текст — троеточие тут подстраховка на случай очень
+              длинного описания, а не рабочий лимит. */}
+          <p className="line-clamp-[14] text-sm text-muted-foreground xl:text-base">
             {product.description}
           </p>
           {hasVariants && (
