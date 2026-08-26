@@ -11,7 +11,12 @@ export function YandexMetrika() {
       <link rel="preconnect" href="https://mc.yandex.ru" />
       <link rel="dns-prefetch" href="https://mc.yandex.ru" />
 
-      <Script id="yandex-metrika" strategy="afterInteractive">
+      {/* beforeInteractive — код счётчика попадает в серверный HTML, а не
+          вставляется после гидратации. Так его видят проверяющие роботы
+          (Вебмастер, SEO-сервисы) и считаются визиты тех, кто ушёл
+          со страницы раньше, чем догрузился JS Next.js.
+          Работает только в корневом layout — там компонент и вызывается. */}
+      <Script id="yandex-metrika" strategy="beforeInteractive">
         {`
           (function(m,e,t,r,i,k,a){
             m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
