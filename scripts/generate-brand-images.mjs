@@ -9,7 +9,7 @@
  *   public/icon-192.png      192×192   — иконка для manifest.webmanifest
  *   public/icon-512.png      512×512   — иконка для manifest + logo в JSON-LD
  *   src/app/apple-icon.png   180×180   — иконка для «на экран Домой» в iOS
- *   src/app/favicon.ico      32×32     — фавиконка (её ищут поисковики для выдачи)
+ *   src/app/favicon.ico      16/32/48  — фавиконка (её ищут поисковики для выдачи)
  *
  * Скрипт запускается вручную и НЕ входит в сборку: результат коммитится в репозиторий,
  * чтобы в Docker-образе не требовались системные шрифты для растеризации текста.
@@ -87,27 +87,71 @@ function ogImageSvg() {
 }
 
 /**
- * Упаковывает PNG в контейнер .ico. Формат допускает PNG внутри ICO
- * (поддерживается всеми актуальными браузерами), поэтому перекодировать
- * в BMP не нужно — достаточно заголовка и одной записи каталога.
+ * Один кадр .ico в классическом BMP-виде: BITMAPINFOHEADER, пиксели BGRA
+ * снизу вверх и пустая AND-маска.
+ *
+ * PNG внутри ICO понимают браузеры, но не любой парсер поисковых роботов,
+ * а фавиконку для выдачи забирает отдельный робот со своим кодом разбора.
+ * BMP-кадры читают все, поэтому платим лишними килобайтами за совместимость.
  */
-function pngToIco(png, size) {
+function bmpIcoFrame(rgba, size) {
+  // XOR-слой: сама картинка, строки идут снизу вверх, каналы в порядке BGRA
+  const xor = Buffer.alloc(size * size * 4);
+  for (let y = 0; y < size; y++) {
+    const src = (size - 1 - y) * size * 4;
+    const dst = y * size * 4;
+    for (let x = 0; x < size; x++) {
+      const s = src + x * 4;
+      const d = dst + x * 4;
+      xor[d] = rgba[s + 2];
+      xor[d + 1] = rgba[s + 1];
+      xor[d + 2] = rgba[s];
+      xor[d + 3] = rgba[s + 3];
+    }
+  }
+
+  // AND-маска обязательна даже для 32-битных иконок. Нули = пиксель непрозрачный,
+  // прозрачность берётся из альфа-канала. Строки выравниваются по 4 байта.
+  const maskStride = Math.ceil(size / 32) * 4;
+  const and = Buffer.alloc(maskStride * size);
+
+  const header = Buffer.alloc(40);
+  header.writeUInt32LE(40, 0); // размер заголовка
+  header.writeInt32LE(size, 4); // ширина
+  header.writeInt32LE(size * 2, 8); // высота: XOR-слой + AND-маска
+  header.writeUInt16LE(1, 12); // color planes
+  header.writeUInt16LE(32, 14); // бит на пиксель
+  header.writeUInt32LE(0, 16); // без сжатия (BI_RGB)
+  header.writeUInt32LE(xor.length + and.length, 20); // размер данных
+
+  return Buffer.concat([header, xor, and]);
+}
+
+/** Собирает .ico из нескольких кадров разного размера. */
+function buildIco(frames) {
   const header = Buffer.alloc(6);
   header.writeUInt16LE(0, 0); // reserved
   header.writeUInt16LE(1, 2); // тип: 1 — иконка
-  header.writeUInt16LE(1, 4); // количество изображений
+  header.writeUInt16LE(frames.length, 4); // количество изображений
 
-  const entry = Buffer.alloc(16);
-  entry.writeUInt8(size === 256 ? 0 : size, 0); // ширина (0 означает 256)
-  entry.writeUInt8(size === 256 ? 0 : size, 1); // высота
-  entry.writeUInt8(0, 2); // палитра не используется
-  entry.writeUInt8(0, 3); // reserved
-  entry.writeUInt16LE(1, 4); // color planes
-  entry.writeUInt16LE(32, 6); // бит на пиксель
-  entry.writeUInt32LE(png.length, 8);
-  entry.writeUInt32LE(header.length + entry.length, 12); // смещение данных
+  const entries = [];
+  let offset = header.length + frames.length * 16;
 
-  return Buffer.concat([header, entry, png]);
+  for (const { size, data } of frames) {
+    const entry = Buffer.alloc(16);
+    entry.writeUInt8(size === 256 ? 0 : size, 0); // ширина (0 означает 256)
+    entry.writeUInt8(size === 256 ? 0 : size, 1); // высота
+    entry.writeUInt8(0, 2); // палитра не используется
+    entry.writeUInt8(0, 3); // reserved
+    entry.writeUInt16LE(1, 4); // color planes
+    entry.writeUInt16LE(32, 6); // бит на пиксель
+    entry.writeUInt32LE(data.length, 8);
+    entry.writeUInt32LE(offset, 12);
+    offset += data.length;
+    entries.push(entry);
+  }
+
+  return Buffer.concat([header, ...entries, ...frames.map((f) => f.data)]);
 }
 
 async function renderPng(svg, relativePath) {
@@ -125,8 +169,20 @@ await renderPng(iconSvg(512, 112), "public/icon-512.png");
 // Для iOS без скруглений — систему устраивает квадрат, маску она наложит сама.
 await renderPng(iconSvg(180, 0), "src/app/apple-icon.png");
 
-const faviconPng = await sharp(Buffer.from(iconSvg(32, 7)))
-  .png({ compressionLevel: 9 })
-  .toBuffer();
-await writeFile(path.join(ROOT, "src/app/favicon.ico"), pngToIco(faviconPng, 32));
-console.log(`src/app/favicon.ico — ${(faviconPng.length / 1024).toFixed(1)} КБ`);
+// Несколько размеров в одном файле: 16 — вкладка браузера, 32 — закладки и
+// выдача, 48 — ярлыки и ретина. Робот выбирает подходящий сам.
+const faviconFrames = [];
+for (const size of [16, 32, 48]) {
+  const rgba = await sharp(Buffer.from(iconSvg(size, Math.round((size * 7) / 32))))
+    .ensureAlpha()
+    .raw()
+    .toBuffer();
+  faviconFrames.push({ size, data: bmpIcoFrame(rgba, size) });
+}
+const favicon = buildIco(faviconFrames);
+await writeFile(path.join(ROOT, "src/app/favicon.ico"), favicon);
+console.log(
+  `src/app/favicon.ico — ${(favicon.length / 1024).toFixed(1)} КБ (${faviconFrames
+    .map((f) => `${f.size}×${f.size}`)
+    .join(", ")})`,
+);
